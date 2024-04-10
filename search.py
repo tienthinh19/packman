@@ -166,11 +166,48 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
-
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    """
+    Search the node that has the lowest combined cost and heuristic first.
+    """
+    # Initialize the frontier using a priority queue
+    # The queue will contain tuplgit config --global user.email "es of the form (state, actions, cost)
+    # The priority will be the current cost + heuristic cost
+    frontier = util.PriorityQueue()
+
+    # Set to keep track of visited states
+    explored = set()
+
+    # Push the start state onto the frontier with initial cost and heuristic
+    start_state = problem.getStartState()
+    frontier.push((start_state, [], 0), 0 + heuristic(start_state, problem))
+
+    while not frontier.isEmpty():
+        # Pop the state from the frontier with the lowest cost + heuristic
+        current_state, actions, cost = frontier.pop()
+
+        # If the current state is the goal, return the actions to get here
+        if problem.isGoalState(current_state):
+            return actions
+
+        # If the current state has not been visited, explore it
+        if current_state not in explored:
+            explored.add(current_state)
+
+            # For each successor of the current state
+            for successor, action, step_cost in problem.getSuccessors(current_state):
+                new_cost = cost + step_cost  # Total cost to reach successor
+                heuristic_cost = heuristic(successor, problem)  # Heuristic cost from successor to goal
+                new_actions = actions + [action]  # Actions taken to reach successor
+
+                # If the successor has not been explored, add it to the frontier
+                # Note: No need to check if it's already in the frontier with a higher cost,
+                # as the priority queue will automatically handle prioritizing lower costs
+                if successor not in explored:
+                    frontier.push((successor, new_actions, new_cost), new_cost + heuristic_cost)
+
+    # If no solution is found, return an empty list
+    return []
 
 
 # Abbreviations
